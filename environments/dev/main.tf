@@ -55,3 +55,39 @@ module "ec2" {
   network_interface_id = module.network_interface.network_interface_id
   instance_name        = "sohit-web-server"
 }
+
+module "eks" {
+  source = "../../modules/eks"
+
+  cluster_name       = "sohit-eks-dev"
+  kubernetes_version = "1.33"
+
+  subnet_ids = [
+    module.subnet.subnet_id,
+    module.subnet.subnet_2_id
+  ]
+
+  node_subnet_ids = [
+    module.subnet.subnet_id,
+    module.subnet.subnet_2_id
+  ]
+
+  instance_types = [
+    "t3.medium"
+  ]
+
+  capacity_type = "ON_DEMAND"
+
+  desired_size = 2
+  min_size     = 1
+  max_size     = 3
+
+  endpoint_private_access = true
+  endpoint_public_access  = true
+
+  tags = {
+    Environment = "dev"
+    Project     = "terraform-aws-infra"
+    ManagedBy   = "Terraform"
+  }
+}
