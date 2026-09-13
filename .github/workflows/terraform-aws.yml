@@ -32,6 +32,39 @@ jobs:
       # 1. Checkout source code
       - name: Checkout
         uses: actions/checkout@v4
+              # 2. Debug GitHub OIDC token claims
+      - name: Debug GitHub OIDC Claims
+        shell: bash
+        run: |
+          TOKEN=$(curl -s \
+            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" \
+            | jq -r '.value')
+
+          PAYLOAD=$(echo "$TOKEN" | cut -d. -f2)
+
+          python3 - "$PAYLOAD" <<'PY'
+          import sys
+          import json
+          import base64
+
+          payload = sys.argv[1]
+          payload += "=" * (-len(payload) % 4)
+
+          data = json.loads(
+              base64.urlsafe_b64decode(payload).decode("utf-8")
+          )
+
+          print("OIDC Claims:")
+          print("sub              =", data.get("sub"))
+          print("aud              =", data.get("aud"))
+          print("repository       =", data.get("repository"))
+          print("repository_id    =", data.get("repository_id"))
+          print("repository_owner =", data.get("repository_owner"))
+          print("owner_id         =", data.get("repository_owner_id"))
+          print("ref              =", data.get("ref"))
+          print("event_name       =", data.get("event_name"))
+          PY
 
       # 2. Authenticate to AWS using GitHub OIDC
       - name: Configure AWS Credentials
