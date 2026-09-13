@@ -24,7 +24,7 @@ module "security_group" {
 
   vpc_id              = module.vpc.vpc_id
   security_group_name = "sohit-web-sg"
-  ssh_cidr             = var.ssh_cidr
+  ssh_cidr            = var.ssh_cidr
 }
 
 
