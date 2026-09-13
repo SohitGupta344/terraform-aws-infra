@@ -99,6 +99,10 @@ jobs:
       # 1. Checkout source code
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Show GitHub Repository IDs
+        run: |
+          echo "Repository Owner ID: ${{ github.repository_owner_id }}"
+          echo "Repository ID: ${{ github.repository_id }}"
 
       # 2. Authenticate to AWS using GitHub OIDC
       - name: Configure AWS Credentials
